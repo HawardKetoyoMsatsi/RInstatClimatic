@@ -2,51 +2,65 @@
 % Please edit documentation in R/export_cdt.R
 \name{export_cdt}
 \alias{export_cdt}
-\title{Export data in CDT format}
+\title{Export daily or dekadal data in the format for CDT}
 \usage{
 export_cdt(
   data,
   station,
   element,
+  latitude,
+  longitude,
+  altitude,
   type = c("dekad", "daily"),
   date = NULL,
   year = NULL,
   month = NULL,
   dekad = NULL,
   metadata = NULL,
-  latitude,
-  longitude,
-  altitude,
   file_path = paste0("CDT-", element, ".csv"),
   ...
 )
 }
 \arguments{
-\item{data}{The data.frame to calculate from.}
+\item{data}{data.frame of daily or dekadal climatic data in tidy format i.e.
+one row per time point (per station) and one column per element.}
 
-\item{station}{The name of the station column in \code{data}.}
+\item{station}{Name of the station identifying column in \code{data}.}
 
-\item{element}{The name of the element column in \code{data}.}
+\item{element}{Name of the element column in \code{data}.}
 
-\item{type}{Whether \code{dekad} or \code{daily} data is used.}
+\item{latitude}{Name of the latitude column in \code{metadata}.}
 
-\item{date}{The name of the date column in \code{data}. Required if \code{type = "daily"}. If \code{type = "dekad"} this is only needed if \code{year}, \code{month}, and \code{dekad} are not specified.}
+\item{longitude}{Name of the longitude column in \code{metadata}.}
 
-\item{year}{The name of the year column in \code{data}. Only needed if \code{type = "dekad"}. If \code{NULL} it will be created using \code{lubridate::year(data[[date]])}.}
+\item{altitude}{Name of the altitude column in \code{metadata}.}
 
-\item{month}{The name of the month column in \code{data}. Only needed if \code{type = "dekad"}. If \code{NULL} it will be created using \code{lubridate::month(data[[date]])}.}
+\item{type}{Character indicating the type of data, either \code{"dekad"} or
+\code{"daily"}.}
 
-\item{dekad}{The name of the dekad column in \code{data}. Only needed if \code{type = "dekad"}. If \code{NULL} it will be created using \code{dekad} function.}
+\item{date}{Name of the date column in \code{data}. Required if \code{type =
+  "daily"}. If \code{type = "dekad"} this is only needed if \code{year},
+\code{month}, and \code{dekad} are not specified.}
 
-\item{metadata}{The metadata data.frame.}
+\item{year}{Name of the year column in \code{data}. Only needed if \code{type
+  = "dekad"}. If \code{NULL} it will be created using
+\code{lubridate::year(data[[date]])}.}
 
-\item{latitude}{The name of the latitude column in \code{metadata}.}
+\item{month}{Name of the month column in \code{data}. Only needed if
+\code{type = "dekad"}. If \code{NULL} it will be created using
+\code{lubridate::month(data[[date]])}.}
 
-\item{longitude}{The name of the longitude column in \code{metadata}.}
+\item{dekad}{Name of the dekad column in \code{data}. Only needed if
+\code{type = "dekad"}. If \code{NULL} it will be created using \code{dekad}
+function.}
 
-\item{altitude}{The name of the altitude column in \code{metadata}.}
+\item{metadata}{data.frame of station metadata. Use this is the station
+details are in a separate data.frame with one row per station. If
+specified, \code{latitude}, \code{longitude} and \code{altitude} are
+assumed to be in \code{metadata} and \code{station} must be in both
+\code{data} and \code{metadata} to facilitate joining.}
 
-\item{file_path}{TODO}
+\item{file_path}{A character specifying the file path and file name to export}
 
 \item{...}{Other parameters passed to \code{write.csv()}}
 }
@@ -54,11 +68,9 @@ export_cdt(
 Invisibly returns the file path of the saved data
 }
 \description{
-Export data in CDT format
+Export daily or dekadal data in the format for CDT
 }
 \examples{
 # TODO
-
-
 
 }

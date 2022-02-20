@@ -2,13 +2,13 @@
 % Please edit documentation in R/climatic_extremes.R
 \name{climatic_extremes}
 \alias{climatic_extremes}
-\title{Calculate extremes}
+\title{Calculate extremes from climatic data}
 \usage{
 climatic_extremes(
   data,
   date_time,
-  station = NULL,
   elements,
+  station = NULL,
   year = NULL,
   month = NULL,
   dekad = NULL,
@@ -24,7 +24,7 @@ climatic_extremes(
   first_date = FALSE,
   n_dates = FALSE,
   last_date = FALSE,
-  na.rm = FALSE,
+  na_rm = FALSE,
   na_prop = NULL,
   na_n = NULL,
   na_consec = NULL,
@@ -37,9 +37,9 @@ climatic_extremes(
 
 \item{date_time}{The name of the date column in \code{data}.}
 
-\item{station}{The name of the station column in \code{data}, if the data are for multiple station.}
-
 \item{elements}{The name of the column in \code{data} to apply the spell condition to}
+
+\item{station}{The name of the station column in \code{data}, if the data are for multiple station.}
 
 \item{year}{The name of the year column in \code{data}.}
 
@@ -59,9 +59,9 @@ climatic_extremes(
 
 \item{doy_last}{The last day of the year}
 
-\item{max_val}{If \code{TRUE} calculate the extreme maximum}
+\item{max_val}{Logical, if \code{TRUE} the extreme maximum is calculated}
 
-\item{min_val}{If \code{TRUE} calculate the extreme minimum}
+\item{min_val}{Logical, if \code{TRUE} the extreme minimum is calculated}
 
 \item{first_date}{If \code{TRUE} the first instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. first \code{date_time} when the maximum occurred.}
 
@@ -69,7 +69,7 @@ climatic_extremes(
 
 \item{last_date}{If \code{TRUE} the last instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. last \code{date_time} when the maximum occurred.}
 
-\item{na.rm}{If \code{TRUE} all \code{na_} parameters are ignored and missing
+\item{na_rm}{If \code{TRUE} all \code{na_} parameters are ignored and missing
 values are removed. If \code{FALSE} missing values are not removed unless
 any \code{na_} parameters are specified.}
 
@@ -88,7 +88,7 @@ any \code{na_} parameters are specified.}
 
 }
 \description{
-Calculate extremes
+Calculate extremes from climatic data
 }
 \examples{
 # TODO

@@ -10,13 +10,14 @@ timeseries_plot(
   elements,
   station = NULL,
   facets = c("stations", "elements", "both", "none"),
+  type = c("line", "bar"),
   add_points = FALSE,
   add_line_of_best_fit = FALSE,
   se = TRUE,
   add_path = FALSE,
   add_step = FALSE,
-  na.rm = FALSE,
-  show.legend = NA
+  na_rm = FALSE,
+  show_legend = NA
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ Timeseries plots are calculated separately for each station.}
 
 \item{facets}{How to split the time series plots. Default \code{"station"}. Can be one of \code{"elements"}, \code{"both"}, or \code{"none"}.}
 
+\item{type}{The type of plot, either "line" or line graphs or "bar" for bar graphs.}
+
 \item{add_points}{logical. If \code{TRUE}, points are added to the plot using  \code{"ggplot2::geom_point()"}.}
 
 \item{add_line_of_best_fit}{logical. If \code{TRUE}, points are added to the plot using  \code{"ggplot2::geom_smooth(method = "lm")"}.}
@@ -41,9 +44,9 @@ Timeseries plots are calculated separately for each station.}
 
 \item{add_step}{logical. If \code{TRUE}, steps are added to the plot using  \code{"ggplot2::geom_step()"}.}
 
-\item{na.rm}{If \code{FALSE}, the default, missing values are removed with a warning. If \code{TRUE}, missing values are silently removed.}
+\item{na_rm}{If \code{FALSE}, the default, missing values are removed with a warning. If \code{TRUE}, missing values are silently removed.}
 
-\item{show.legend}{logical. Should this layer be included in the legends? \code{NA}, the default, includes if any aesthetics are mapped. \code{FALSE} never includes, and \code{TRUE} always includes.}
+\item{show_legend}{logical. Should this layer be included in the legends? \code{NA}, the default, includes if any aesthetics are mapped. \code{FALSE} never includes, and \code{TRUE} always includes.}
 }
 \value{
 

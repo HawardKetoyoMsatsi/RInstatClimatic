@@ -9,11 +9,11 @@ prepare_geoclim_pentad(
   year,
   pentad,
   element,
-  metadata = NULL,
-  join_by = NULL,
   station_id,
   latitude,
   longitude,
+  metadata = NULL,
+  join_by = NULL,
   add_cols = NULL
 )
 }
@@ -26,17 +26,17 @@ prepare_geoclim_pentad(
 
 \item{element}{The name of the column in \code{data} to apply the function to.}
 
-\item{metadata}{TODO}
-
-\item{join_by}{TODO}
-
 \item{station_id}{TODO}
 
 \item{latitude}{TODO}
 
 \item{longitude}{TODO}
 
-\item{add_cols}{TODO}
+\item{metadata}{TODO}
+
+\item{join_by}{TODO}
+
+\item{add_cols}{Names of additional metadata columns that should be included in the output}
 }
 \value{
 
