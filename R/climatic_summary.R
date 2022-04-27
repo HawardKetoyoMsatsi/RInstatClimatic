@@ -1,42 +1,50 @@
-#' Title
+#' Calculate summaries from climatic data
 #' 
-#' @param data The data.frame to calculate from
-#' @param date_time The name of the date column in \code{data}.
-#' @param station The name of the station column in \code{data}, if the data are for multiple station. 
-#' @param elements The name of the column in \code{data} to apply the spell condition to
-#' @param year The name of the year column in \code{data}.
-#' @param month The name of the month column in \code{data}. 
-#' @param dekad TODO
-#' @param pentad TODO
-#' @param to TODO
-#' @param by TODO
-#' @param doy The name of the day of the year (1-366) column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[doy]])}.
-#' @param doy_first The first day of the year.
-#' @param doy_last The last day of the year
-#' @param summaries A named character vector of summary functions. The names are
-#'   the used as the column names in the results. The values can be any function
-#'   name as a string. e.g. c(mean = "mean", st_dv = "sd", n_na =
-#'   "naflex::na_n")
-#' @param na_rm If \code{TRUE} all \code{na_} parameters are ignored and missing
+#' @description \code{climatic_summary} returns a data table displaying
+#' summary statistics for element(s) (and for each station) in a given time period.
+#' 
+#' @param data \code{data.frame} The data.frame to calculate from.
+#' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
+#' @param station \code{character(1)} The name of the station column in \code{data}, if the data are for multiple station.
+#' @param elements \code{character} The name of the elements column in \code{data} to apply the function to.
+#' @param year \code{character(1)} The name of the year column in \code{data}.
+#' @param month \code{character(1)} The name of the month column in \code{data}. 
+#' @param dekad \code{character(1)} The name of the dekad column in \code{data}.
+#' @param pentad \code{character(1)} The name of the pentad column in \code{data}.
+#' @param to \code{character(1)} The date-time format to put the data into.
+#' @param by \code{character} The name of columns in \code{data} to group the summary data by.
+#' @param doy \code{character(1)} The name of the day of the year (1-366) column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[doy]])}.
+#' @param doy_first \code{integer(1)} The first day of the year.
+#' @param doy_last \code{integer(1)} The last day of the year.
+#' @param summaries \code{character} A named character vector of summary functions. The names are
+#'   used as the column names in the results. The values can be any function
+#'   name as a string or a function call as a formula. e.g. c(mean = "mean", st_dv = "sd", n = "~dplyr::n()")
+#' @param na_rm \code{logical(1)} If \code{TRUE} all \code{na_} parameters are ignored and missing
 #'   values are removed. If \code{FALSE} missing values are not removed unless
 #'   any \code{na_} parameters are specified.
-#' @param na_prop Max proportion of missing values allowed
-#' @param na_n Max number of missing values allowed
-#' @param na_consec Max number of consecutive missing values allowed
-#' @param na_n_non Min number of non-missing values required
+#' @param na_prop \code{integer(1)} Max proportion of missing values allowed
+#' @param na_n \code{integer(1)} Max number of missing values allowed
+#' @param na_consec \code{integer(1)} Max number of consecutive missing values allowed
+#' @param na_n_non \code{integer(1)} Min number of non-missing values required
 #' @param names Format of column names. Passed to \code{.names} in
 #'   \code{dplyr::across}
-#' @param summaries_params Additional parameters to pass to \code{summaries}.
+#' @param summaries_params \code{list} Additional parameters to pass to \code{summaries}.
 #'   Must be a list of lists with the same names as \code{summaries}.
-#' @param first_date If \code{TRUE} the first instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. first \code{date_time} when the maximum occurred.
-#' @param n_dates If \code{TRUE} the number of \code{date_time} points when the value equals the summary value is included. Generally only used for extreme summaries i.e. number of days in which the minimum occurred.
-#' @param last_date If \code{TRUE} the last instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. last \code{date_time} when the maximum occurred.
+#' @param first_date \code{logical(1)} If \code{TRUE} the first instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. first \code{date_time} when the maximum occurred.
+#' @param n_dates \code{logical(1)} If \code{TRUE} the number of \code{date_time} points when the value equals the summary value is included. Generally only used for extreme summaries i.e. number of days in which the minimum occurred.
+#' @param last_date \code{logical(1)} If \code{TRUE} the last instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. last \code{date_time} when the maximum occurred.
 #'
-#' @return
+#' @return A summary data frame for selected element(s) in climatic data.
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' # Calculate frequencies for tmin/tmax for each year, month, and station.
+#' # filter daily_niger data for the example
+#' daily_niger_1 <- daily_niger %>% dplyr::filter(year > 1960)
+#' climatic_summary(data = daily_niger_1, date_time = "date", station = "station_name",
+#'                  elements = c("tmin", "tmax"), to = "monthly")
 #' @importFrom rlang .data
+
 climatic_summary <- function(data, date_time, station = NULL, elements = NULL, 
                              year = NULL, month = NULL, dekad = NULL, 
                              pentad = NULL,
@@ -47,7 +55,7 @@ climatic_summary <- function(data, date_time, station = NULL, elements = NULL,
                                     "overall"),
                              by = NULL,
                              doy = NULL, doy_first = 1, doy_last = 366, 
-                             summaries = c(n = "dplyr::n"), na_rm = FALSE,
+                             summaries = c(n = "~dplyr::n()"), na_rm = FALSE,
                              na_prop = NULL, na_n = NULL, na_consec = NULL, 
                              na_n_non = NULL,
                              first_date = FALSE, n_dates = FALSE, last_date = FALSE,
@@ -57,6 +65,15 @@ climatic_summary <- function(data, date_time, station = NULL, elements = NULL,
   assert_column_names(data, date_time)
   checkmate::assert(checkmate::check_date(data[[date_time]]), 
                     checkmate::check_posixct(data[[date_time]]))
+  checkmate::assert_character(elements)
+  assert_column_names(data, elements)
+  if (length(elements) == 1 && 
+      elements == "obsValue" && 
+      "describedBy" %in% names(data)) {
+    element_names <- as.character(unique(data[["describedBy"]]))
+    data <- elements_wider(data, name = "describedBy", value = elements)
+    elements <- element_names
+  }
   checkmate::assert_string(station, null.ok = TRUE)
   if (!is.null(station)) assert_column_names(data, station)
   checkmate::assert_string(year, null.ok = TRUE)
@@ -201,19 +218,23 @@ climatic_summary <- function(data, date_time, station = NULL, elements = NULL,
   }
   exp_summaries <- vector("list", length(summaries))
   names(exp_summaries) <- names(summaries)
+  lambda_summaries <- exp_summaries
   for (i in seq_along(summaries)) {
     fn_exp <- summaries[[i]]
-    fn_exp <- paste0(fn_exp, "(", .x_call)
-    add_params <- summaries_params[[names(summaries)[i]]]
-    fn_exp <- add_params(fn_exp, add_params)
-    fn_exp <- paste0(fn_exp, ")")
+    if (!startsWith(fn_exp, "~")) {
+      fn_exp <- paste0(fn_exp, "(", .x_call)
+      add_params <- summaries_params[[names(summaries)[i]]]
+      fn_exp <- add_params(fn_exp, add_params)
+      fn_exp <- paste0(fn_exp, ")")
+    }
     exp_summaries[[i]] <- fn_exp
+    lambda_summaries[[i]] <- ifelse(startsWith(fn_exp, "~"), fn_exp, 
+                               paste0("~", fn_exp))
   }
-  lambda_summaries <- paste0("~", exp_summaries)
   lambda_summaries <- sapply(lambda_summaries, stats::formula)
   names(lambda_summaries) <- names(summaries)
   sum_data <- grp_data %>%
-    dplyr::summarise(dplyr::across(dplyr::all_of(elements), 
+    dplyr::summarise(dplyr::across(tidyselect::all_of(elements), 
                                    lambda_summaries, .names = names))
   
   if (first_date || n_dates || last_date) {

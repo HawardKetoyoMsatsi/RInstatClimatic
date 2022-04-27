@@ -1,49 +1,66 @@
-#' Inventory Plot
+#' Produce an inventory of available and missing data
 #' 
-#' Produces an inventory of available and missing data
+#' @description Returns an inventory plot using \code{ggplot2} that displays
+#' whether a value is observed or missing for each element and station given.
+#' Takes a data frame as an input and the relevant columns to create the plot.
 #'
-#' @param data The data.frame to calculate from.
-#' @param date The name of the date column in \code{data}.
-#' @param elements The name of the column in \code{data} to apply the function to.
-#' @param station The name of the station column in \code{data}, if the data are for multiple station. 
-#' @param year The name of the year column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[date]])}.
-#' @param doy The name of the day of the year (1-366) column in \code{data}. 
-#' If \code{doy} is \code{NULL} then it can be calculated as \code{yday_366(data[[date]])} if \code{date} is provided.
-#' @param year_doy_plot TODO
-#' @param facet_by TODO
-#' @param facet_x_size TODO
-#' @param facet_y_size TODO
-#' @param title The text for the title.
-#' @param plot_title_size TODO
-#' @param x_title The text for the x-axis.
-#' @param y_title The text for the y-axis.
-#' @param x_scale_from TODO - see ?scale_continuous 
-#' @param x_scale_to TODO
-#' @param x_scale_by TODO
+#' @param data \code{data.frame} The data.frame to calculate from.
+#' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
+#' @param elements \code{character} The name of the elements column in \code{data} to apply the function to.
+#' @param station \code{character(1)} The name of the station column in \code{data}, if the data are for multiple station.
+#' @param year \code{character(1)} The name of the year column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[date_time]])}.
+#' @param doy \code{character(1)} The name of the day of the year (1-366) column in \code{data}. If \code{doy} is \code{NULL} then it can be calculated as \code{yday_366(data[[date_time]])} if \code{date_time} is provided.
+#' @param year_doy_plot \code{logical(1)} Whether the day of year should be on the y-axis on the plot.
+#' @param title \code{character(1)} The text for the title.
+#' @param plot_title_size \code{numeric(1)} Text size for the title in pts.
+#' @param plot_title_hjust \code{numeric(1)} Horizontal justification for title. Value between 0 and 1.
+#' @param x_title \code{character(1)} The text for the x-axis.
+#' @param y_title \code{character(1)} The text for the y-axis.
+#' @param x_scale_from \code{integer(1)} The year to display the inventory plot from.
+#' @param x_scale_to \code{integer(1)} The year to display the inventory plot to.
+#' @param x_scale_by \code{integer(1)} The difference, in years, to give the x tick marks between from and to.
 #' @param y_date_format TODO
 #' @param y_date_scale_by TODO
 #' @param y_date_scale_step TODO
-#' @param facet_scales TODO
+#' @param facet_by \code{character(1)} Whether to facet by stations, elements, or both. Options are \code{"stations"}, \code{"elements"}, \code{"station-elements"}, \code{"elements-stations"}.
+#' In \code{"station-elements"}, stations are given as rows and elements as columns. In \code{"elements-stations"}, elements are given as rows and stations as columns.
+#' @param facet_x_size \code{numeric(1)} Text size for the facets on the x-axis in pts.
+#' @param facet_y_size \code{numeric(1)} Text size for the facets on the y-axis in pts.
+#' @param facet_scales \code{character(1)} Are scales shared across all facets (the default, \code{"fixed"}),
+#' or do they vary across rows (\code{"free_x"}), columns (\code{"free_y"}), or both rows and columns (\code{"free"})?
 #' @param facet_dir TODO
-#' @param facet_x_margin TODO
-#' @param facet_y_margin TODO
-#' @param facet_nrow TODO
-#' @param facet_ncol TODO
-#' @param missing_colour TODO
-#' @param present_colour TODO
-#' @param missing_label TODO
-#' @param present_label TODO
-#' @param display_rain_days TODO
-#' @param rain TODO
+#' @param facet_x_margin \code{numeric(4)} Margin width around the text for the x-facets.
+#' @param facet_y_margin \code{numeric(4)} Margin width around the text for the y-facets.
+#' @param facet_nrow \code{integer(1)} Number of rows for the facets if `facet_by` is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_ncol} is given.
+#' @param facet_ncol \code{integer(1)} Number of rows for the facets if `facet_by` is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_nrow} is given.
+#' @param missing_colour \code{character(1)} Colour to represent the missing values. Default \code{"red"}.
+#' @param present_colour \code{character(1)} Colour to represent the observed values. Default \code{"grey"}.
+#' @param missing_label \code{character(1)} Label to give in legend for missing values. Default \code{"Missing"}.
+#' @param present_label \code{character(1)} Label to give in legend for observed values. Default \code{"Present"}.
+#' @param display_rain_days \code{logical(1)} If \code{rain} parameter is not \code{NULL}, and \code{rain} is not an element in the \code{elements} parameter, whether to include dry and rainy days.
+#' @param rain \code{character(1)} The name of the rain column in \code{data}. 
 #' @param rain_cats TODO 
-#' @param coord_flip TODO
-#' @param plot_title_hjust TODO
+#' @param labels \code{character} If \code{display_rain_days = TRUE}, the labels in the key for dry and rainy days. By default, \code{c("Dry", "Rain")}
+#' @param key_colours \code{character} If \code{display_rain_days = TRUE}, the colours for dry and rainy days. By default, \code{c("tan3", "blue"))}
+#' @param coord_flip \code{logical(1)} Whether to switch the x and y axes.
 #'
-#' @return
-#' @export
+#' @return A plot of type \code{ggplot} to the default plot device
+#' @export 
 #'
-#' @examples # TODO
-inventory_plot <- function(data, date, elements, station = NULL, year = NULL, doy = NULL,  
+#' @examples
+#' # Create an inventory plot with two elements and by station.
+#' data(daily_niger)
+#' inventory_plot(data = daily_niger, station = "station_name", elements = c("tmax", "tmin"),
+#'                date_time = "date")
+#'
+#' # Create an inventory plot by year and day of year
+#' inventory_plot(data = daily_niger, station = "station_name", elements = c("tmax", "tmin"),
+#'                date_time = "date", year_doy_plot = TRUE)
+#'
+#' # Can add in rainy/dry days into the plot
+#' inventory_plot(data = daily_niger, station = "station_name", elements = c("tmax", "tmin"),
+#'                date_time = "date", rain = "rain", display_rain_days = TRUE)
+inventory_plot <- function(data, date_time, elements, station = NULL, year = NULL, doy = NULL,  
                            year_doy_plot = FALSE, facet_by = NULL, 
                            facet_x_size = 7, facet_y_size = 11,
                            title = "Inventory Plot", plot_title_size = NULL, plot_title_hjust = 0.5,
@@ -63,11 +80,20 @@ inventory_plot <- function(data, date, elements, station = NULL, year = NULL, do
                            coord_flip = FALSE) {
   
   checkmate::assert_data_frame(data)
-  assert_column_names(data, date)
-  checkmate::assert_string(date)
-  checkmate::assert_date(data[[date]])
+  assert_column_names(data, date_time)
+  checkmate::assert_string(date_time)
+  checkmate::assert(checkmate::check_date(data[[date_time]]), 
+                    checkmate::check_posixct(data[[date_time]]))
+  data[[date_time]] <- as.Date(data[[date_time]])
   checkmate::assert_character(elements)
   assert_column_names(data, elements)
+  if (length(elements) == 1 && 
+      elements == "obsValue" && 
+      "describedBy" %in% names(data)) {
+    element_names <- as.character(unique(data[["describedBy"]]))
+    data <- elements_wider(data, name = "describedBy", value = elements)
+    elements <- element_names
+  }
   if (!is.null(station)) assert_column_names(data, station)
   
   if (display_rain_days && !is.null(rain) && !rain %in% elements) elements <- c(elements, rain)
@@ -79,17 +105,17 @@ inventory_plot <- function(data, date, elements, station = NULL, year = NULL, do
   if(year_doy_plot) {
     if(is.null(year)) {
       year <- "year"
-      data[[year]] <- lubridate::year(data[[date]])
+      data[[year]] <- lubridate::year(data[[date_time]])
     }
     if(is.null(doy)) {
       doy <- "doy"
-      data[[doy]] <- yday_366(data[[date]])
+      data[[doy]] <- yday_366(data[[date_time]])
     }
   }
   
   theme_blank_y_axis <- ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), axis.line.y = ggplot2::element_blank())
   if (length(elements) > 1) {
-    id.vars <- c(date, year, doy)
+    id.vars <- c(date_time, year, doy)
     if(!is.null(station)) id.vars <- c(station, id.vars)
     suppressWarnings(data <- reshape2::melt(data, measure.vars = elements, id.vars = id.vars, value.name = "value", variable.name = "variable"))
     elements <- "value"
@@ -176,7 +202,7 @@ inventory_plot <- function(data, date, elements, station = NULL, year = NULL, do
                               date_labels = y_date_format)
     }
   } else {
-    g <- ggplot2::ggplot(data = data, ggplot2::aes_(x = as.name(date), y = 1, fill = as.name(key_name))) + ggplot2::geom_raster() + ggplot2::scale_fill_manual(values = key) + ggplot2::scale_x_date(date_minor_breaks = "1 year")
+    g <- ggplot2::ggplot(data = data, ggplot2::aes_(x = as.name(date_time), y = 1, fill = as.name(key_name))) + ggplot2::geom_raster() + ggplot2::scale_fill_manual(values = key) + ggplot2::scale_x_date(date_minor_breaks = "1 year")
     if (!is.null(station) && multi_elements) {
       if (is.null(facet_by) || facet_by == "stations") {
         if (is.null(facet_by)) message("facet_by not specified. facets will be by stations.")
@@ -208,7 +234,7 @@ inventory_plot <- function(data, date, elements, station = NULL, year = NULL, do
         data[[station]] <- factor(data[[station]])
       g <-
         ggplot2::ggplot(data = data, ggplot2::aes_(
-          x = as.name(date),
+          x = as.name(date_time),
           y = as.name(station),
           fill = as.name(key_name)
         )) + 
@@ -221,7 +247,7 @@ inventory_plot <- function(data, date, elements, station = NULL, year = NULL, do
       }
     }
     else if (multi_elements) {
-      g <- ggplot2::ggplot(data = data, ggplot2::aes_(x = as.name(date), y = as.name("variable"), fill = as.name(key_name))) + 
+      g <- ggplot2::ggplot(data = data, ggplot2::aes_(x = as.name(date_time), y = as.name("variable"), fill = as.name(key_name))) + 
         ggplot2::geom_raster() + 
         ggplot2::scale_fill_manual(values = key) + 
         ggplot2::scale_x_date(date_minor_breaks = "1 year") + 
@@ -231,7 +257,7 @@ inventory_plot <- function(data, date, elements, station = NULL, year = NULL, do
     else {
       g <-
         ggplot2::ggplot(data = data, ggplot2::aes_(
-          x = as.name(date),
+          x = as.name(date_time),
           y = 1,
           fill = as.name(key_name)
         )) + 

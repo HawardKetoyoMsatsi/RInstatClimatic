@@ -1,21 +1,32 @@
-#' Title
+#' Outputs data in the format for the CPT software
+#' 
+#' @description `output_CPT` returns a data frame to a format suitable for
+#' use in the CPT software.
+#' 
+#' @param data \code{data.frame} The data.frame to calculate from.
+#' @param lat_lon_data \code{data.frame} The name of the metadata to calculate from.
+#' @param station_latlondata \code{character(1)} The name of the station column in \code{lat_lon_data}, or \code{data} if \code{long_data = FALSE}.
+#' @param latitude \code{character(1)} The name of the latitude column in \code{lat_lon_data}, or \code{data} if \code{long_data = FALSE}.
+#' @param longitude \code{character(1)} The name of the longitude column in \code{lat_lon_data}, or \code{data} if \code{long_data = FALSE}.
+#' @param station \code{character(1)} The name of the station column in \code{data}, if the data are for multiple station.
+#' @param year \code{character(1)} The name of the year column in \code{data}.
+#' @param element \code{character(1)} The name of the element column in \code{data} to apply the function to.
+#' @param long_data \code{logical(1)} Whether all columns are in \code{data}. If all data is in one data frame then must have \code{long_data = TRUE}.
+#' @param na_code \code{numeric(1)} Indicator for NA values in data.
 #'
-#' @param data The data.frame to calculate from.
-#' @param lat_lon_data TODO
-#' @param station_latlondata TODO
-#' @param latitude TODO
-#' @param longitude TODO
-#' @param station The name of the station column in \code{data}, if the data are for multiple station. 
-#' @param year The name of the year column in \code{data}.
-#' @param element The name of the column in \code{data} to apply the function to.
-#' @param long.data TODO
-#' @param na_code TODO
-#'
-#' @return
+#' @return A data.frame formatted for use in CPT.
 #' @export
 #'
-#' @examples # TODO
-output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitude, station, year, element, long.data = TRUE, na_code = -999) {
+#' @examples
+#' # Create summary data
+#' yearly_niger <- daily_niger %>% dplyr::group_by(station_name, year) %>%
+#'     dplyr::summarise(mean_rain = mean(rain))
+#' output_CPT(data = yearly_niger, lat_lon_data = stations_niger,
+#'            station_latlondata = "station_name", latitude = "lat", longitude = "long",
+#'            station = "station_name", year = "year", element = "mean_rain")
+
+output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitude, station, year,
+                       element, long_data = TRUE, na_code = -999) {
   
   if(missing(data)) stop("data should be provided")
   if(missing(station)) stop("station must be provided")
@@ -25,7 +36,7 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
   lat_lon_labels <- c("LAT", "LON")
   
   if(missing(lat_lon_data)) {
-    if(long.data) {
+    if(long_data) {
       data <- data %>% dplyr::select(!!! rlang::quos(station, year, element, latitude, longitude))
       names(data)[1] <- "station"
       names(data)[2] <- "year"
@@ -35,12 +46,12 @@ output_CPT <- function(data, lat_lon_data, station_latlondata, latitude, longitu
       
       data <- data %>% dplyr::filter(!is.na(station))
     }
-    else stop("If all data is in one data frame then must have long.data = TRUE")
+    else stop("If all data is in one data frame then must have long_data = TRUE")
   }
   else {
     if(missing(station_latlondata)) stop("station must be provided for lat_lon_data")
     
-    if(long.data) {
+    if(long_data) {
       yearly_data <- data %>% dplyr::select(!!! rlang::quos(station, year, element))
       names(yearly_data)[1] <-  "station"
       names(yearly_data)[2] <-  "year"

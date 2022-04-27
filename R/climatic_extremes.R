@@ -1,14 +1,24 @@
 #' Calculate extremes from climatic data
 #' 
+#' @description \code{climatic_extremes} returns a data table displaying the minimum and/or maximum
+#' values for elements in a given time period. This can be provided by station.
+#' 
 #' @inheritParams climatic_summary
 #' 
-#' @param max_val Logical, if \code{TRUE} the extreme maximum is calculated
-#' @param min_val Logical, if \code{TRUE} the extreme minimum is calculated
+#' @param max_val \code{logical(1)} If \code{TRUE} the extreme maximum is calculated.
+#' @param min_val \code{logical(1)} If \code{TRUE} the extreme minimum is calculated.
 #'
-#' @return
+#' @return A summary data frame containing minimum/maximum values for element(s).
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' # Run example for a subset of the data
+#' daily_niger_1 <- daily_niger %>% dplyr::filter(year > 1970)
+#' # create a data frame displaying the min and max values for tmin/tmax for each day and station
+#' climatic_extremes(data = daily_niger_1, date_time = "date", elements = c("tmin", "tmax"),
+#'                   max_val = TRUE, min_val = TRUE,
+#'                   station = "station_name", na_rm = TRUE)
+
 climatic_extremes <- function(data, date_time, elements, station = NULL,
                               year = NULL, month = NULL, dekad = NULL, 
                               pentad = NULL,

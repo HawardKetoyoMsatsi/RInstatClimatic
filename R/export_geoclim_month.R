@@ -1,12 +1,25 @@
 #' Export monthly data in GeoCLIM format
+#' 
+#' @description `export_geoclim_month` takes a data frame that is given by
+#' month. This data frame is then rearranged using `prepare_geoclim_month` to a
+#' format suitable for use in GeoCLIM, and then written to a file or connection.
+#' 
 #' @inheritParams prepare_geoclim_month
-#' @param file_path TODO
-#' @param ... Other parameters passed to \code{write.csv()}
+#' @param file_path \code{character(1)} A character specifying the file path and file name to export.
+#' @param ... Other parameters passed to \code{write.csv()}.
 #'
-#' @return Invisibly returns the file path of the saved data
+#' @return Invisibly returns the file path of the saved data.
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' # Calculate monthly summaries for the rainfall column
+#' summary_data <- daily_niger %>% dplyr::group_by(year, month, station_name) %>%
+#'      dplyr::summarise(mean_rain = mean(rain))
+#' export_geoclim_month(data = summary_data, year = "year", month = "month",
+#'                      station_id = "station_name",
+#'                      element = "mean_rain", metadata = stations_niger,
+#'                      join_by = "station_name",
+#'                      latitude = "lat", longitude = "long")
 export_geoclim_month <- function(data, year, month, element,  station_id,
                                  latitude, longitude, metadata = NULL,
                                  join_by = NULL, add_cols = NULL, 

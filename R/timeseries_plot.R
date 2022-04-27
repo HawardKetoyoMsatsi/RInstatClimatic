@@ -1,35 +1,55 @@
-#' Timeseries Plot
+#' Produce a timeseries graph
+#' 
+#' @description Returns a timeseries plot using \code{ggplot2} for each element
+#' and station given. Takes a data frame as an input and the relevant columns to
+#' create the plot.
 #'
-#' @param data The data.frame to calculate from.
-#' @param date_time The name of the date column in \code{data}.
-#' @param elements The name of the column in \code{data} to apply the function to.
-#' @param station The name of the station column in \code{data}, if the data are for multiple station.
+#' @param data \code{data.frame} The data.frame to calculate from.
+#' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
+#' @param elements \code{character} The name of the elements column in \code{data} to apply the function to.
+#' @param station \code{character(1)} The name of the station column in \code{data}, if the data are for multiple station.
 #' Timeseries plots are calculated separately for each station.
-#' @param facets How to split the time series plots. Default \code{"station"}. Can be one of \code{"elements"}, \code{"both"}, or \code{"none"}.
-#' @param type The type of plot, either "line" or line graphs or "bar" for bar graphs.
-#' @param add_points logical. If \code{TRUE}, points are added to the plot using  \code{"ggplot2::geom_point()"}.
-#' @param add_line_of_best_fit logical. If \code{TRUE}, points are added to the plot using  \code{"ggplot2::geom_smooth(method = "lm")"}.
-#' @param se logical. If \code{TRUE}, the standard error is are added to the line of best fit. Only works if \code{add_line_of_best_fit = TRUE}. 
-#' @param add_path logical. If \code{TRUE}, paths are added to the plot using  \code{"ggplot2::geom_path()"}.
-#' @param add_step logical. If \code{TRUE}, steps are added to the plot using  \code{"ggplot2::geom_step()"}.
-#' @param na_rm If \code{FALSE}, the default, missing values are removed with a warning. If \code{TRUE}, missing values are silently removed.
-#' @param show_legend logical. Should this layer be included in the legends? \code{NA}, the default, includes if any aesthetics are mapped. \code{FALSE} never includes, and \code{TRUE} always includes.
-#'
-#' @return
+#' @param facet_by \code{character(1)} Whether to facet by stations, elements, both, or neither. Options are \code{"stations"}, \code{"elements"}, \code{"station-elements"}, \code{"elements-stations"}, or \code{"none"}.
+#' @param type \code{character(1)} The type of plot, either "line" or line graphs or "bar" for bar graphs.
+#' @param add_points \code{logical(1)} If \code{TRUE}, points are added to the plot using  \code{"ggplot2::geom_point()"}.
+#' @param add_line_of_best_fit \code{logical(1)} If \code{TRUE}, points are added to the plot using  \code{"ggplot2::geom_smooth(method = "lm")"}.
+#' @param se \code{logical(1)} If \code{TRUE}, the standard error is are added to the line of best fit. Only works if \code{add_line_of_best_fit = TRUE}. 
+#' @param add_path \code{logical(1)} If \code{TRUE}, paths are added to the plot using  \code{"ggplot2::geom_path()"}.
+#' @param add_step \code{logical(1)} If \code{TRUE}, steps are added to the plot using  \code{"ggplot2::geom_step()"}.
+#' @param na_rm \code{logical(1)} If \code{FALSE}, the default, missing values are removed with a warning. If \code{TRUE}, missing values are silently removed.
+#' @param show_legend \code{logical(1)} Should this layer be included in the legends? \code{NA}, the default, includes if any aesthetics are mapped. \code{FALSE} never includes, and \code{TRUE} always includes.
+#' @param title \code{character(1)} The text for the title.
+#' @param x_title \code{character(1)} The text for the x-axis.
+#' @param y_title \code{character(1)} The text for the y-axis.
+#' 
+#' @return a \code{ggplot} object.
 #' @export
 #'
-#' @examples # TODO
-timeseries_plot <- function(data, date_time, elements, station = NULL, facets = c("stations", "elements", "both", "none"),
+#' @examples
+#' # Create a time series plot with two elements and facet by station.
+#' data(daily_niger)
+#' daily_niger_1 <- daily_niger %>% dplyr::filter(year < 1950)
+#' timeseries_plot(data = daily_niger_1, date_time = "date", elements = c("tmax", "tmin"), 
+#'                 station = "station_name", facet_by = "stations")
+#' 
+#' # Can make additional changes to the plot since the returned object is a \code{ggplot2} object
+#' # for example, to add colour-blind friendly colours instead of the default colours
+#' require(ggplot2)
+#' t1 <- timeseries_plot(data = daily_niger_1, date_time = "date", elements = c("tmax", "tmin"), 
+#'                       station = "station_name", facet_by = "stations")
+#' t1 + ggplot2::scale_colour_discrete(type = c("#E69F00", "#56B4E9"))
+timeseries_plot <- function(data, date_time, elements, station = NULL, 
+                            facet_by = c("stations", "elements", "stations-elements", "elements-stations", "none"),
                             type = c("line", "bar"),
                             add_points = FALSE, add_line_of_best_fit = FALSE,
                             se = TRUE, add_path = FALSE, add_step = FALSE,
-                            na_rm = FALSE, show_legend = NA){
+                            na_rm = FALSE, show_legend = NA,
+                            title = "Timeseries Plot", x_title = NULL, y_title = NULL){
   
   checkmate::assert_data_frame(data)
-  # date_time can be a date, factor, or character.
   checkmate::assert_character(elements)
   checkmate::assert_character(station, null.ok = TRUE)
-  facets <- match.arg(facets)
+  facet_by <- match.arg(facet_by)
   type <- match.arg(type)
   checkmate::assert_logical(add_points)
   checkmate::assert_logical(add_line_of_best_fit)
@@ -39,9 +59,9 @@ timeseries_plot <- function(data, date_time, elements, station = NULL, facets = 
   checkmate::assert_logical(na_rm)
   checkmate::assert_logical(show_legend)
   
-  if ((facets == "stations" || facets == "both") && is.null(station)) {
-    warning("facets will be set to 'none' since station is missing")
-    facets <- "none"
+  if ((facet_by == "stations" | facet_by == "stations-elements" | facet_by == "elements-stations") & is.null(station)){
+    warning("facet_by will be set to 'none' since station is missing")
+    facet_by <- "none"
   }
   
   data_longer <- data %>% 
@@ -49,25 +69,21 @@ timeseries_plot <- function(data, date_time, elements, station = NULL, facets = 
                         names_to = "element",
                         values_to = "value")
 
-  if (facets == "elements"){
+  if (facet_by == "elements"){
     if (is.null(station)){
-      base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value)) +
-        ggplot2::facet_grid(cols = ggplot2::vars(.data$element))
+      base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value))
     } else {
-      base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value, colour = .data[[station]])) +
-        ggplot2::facet_grid(cols = ggplot2::vars(.data$element))
+      base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value, colour = .data[[station]]))
     }
-  } else if (facets == "stations"){
+    base_plot <- base_plot + ggplot2::facet_wrap(ggplot2::vars(.data$element))
+  } else if (facet_by == "stations"){
     if (length(elements) == 1){
       base_plot <- ggplot2::ggplot(data, mapping = ggplot2::aes(x = .data[[date_time]], y = .data[[elements]]))
     } else {
       base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value, colour = .data$element))
     }
-    base_plot <- base_plot + ggplot2::facet_grid(cols = ggplot2::vars(.data[[station]]))
-  } else if (facets == "both"){
-    base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value)) +
-      ggplot2::facet_grid(rows = ggplot2::vars(.data[[station]]), cols = ggplot2::vars(.data$element))
-  } else { # if "none", or NULL
+    base_plot <- base_plot + ggplot2::facet_wrap(ggplot2::vars(.data[[station]]))
+  } else if (facet_by == "none") { # if "none", or NULL
     if (length(elements) == 1){
       if (is.null(station)) {
         base_plot <- ggplot2::ggplot(data, mapping = ggplot2::aes(x = .data[[date_time]], y = .data[[elements]]))
@@ -83,7 +99,17 @@ timeseries_plot <- function(data, date_time, elements, station = NULL, facets = 
         base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value, colour = .data$station_elements))
       }
     }
+  } else {
+    base_plot <- ggplot2::ggplot(data_longer, mapping = ggplot2::aes(x = .data[[date_time]], y = .data$value))
+    if (facet_by == "stations-elements"){
+      base_plot <- base_plot +
+      ggplot2::facet_grid(rows = ggplot2::vars(.data[[station]]), cols = ggplot2::vars(.data$element))
+    } else {
+      base_plot <- base_plot +
+        ggplot2::facet_grid(rows = ggplot2::vars(.data$element), cols = ggplot2::vars(.data[[station]]))
+    }
   }
+    
   if (type == "line") {
     base_plot <- base_plot + 
       ggplot2::geom_line(na.rm = na_rm, show.legend = show_legend)
@@ -91,10 +117,7 @@ timeseries_plot <- function(data, date_time, elements, station = NULL, facets = 
     base_plot <- base_plot + 
       ggplot2::geom_col(na.rm = na_rm, show.legend = show_legend)
   }
-  
-  # color by viridis?
-  # base_plot <- base_plot + viridis::scale_colour_viridis(discrete = TRUE, option = "C") # colour blind friendly
-  
+ 
   if (add_points){
     base_plot <- base_plot + ggplot2::geom_point()
   }
@@ -110,6 +133,11 @@ timeseries_plot <- function(data, date_time, elements, station = NULL, facets = 
   if (add_step){
     base_plot <- base_plot + ggplot2::geom_step()
   }
+  
+  base_plot <- base_plot + 
+    ggplot2::xlab(x_title) +
+    ggplot2::ylab(y_title) +
+    ggplot2::labs(title = title)
   
   return(base_plot)
 }

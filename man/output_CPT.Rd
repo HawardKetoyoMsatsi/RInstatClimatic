@@ -2,7 +2,7 @@
 % Please edit documentation in R/output_CPT.R
 \name{output_CPT}
 \alias{output_CPT}
-\title{Title}
+\title{Outputs data in the format for the CPT software}
 \usage{
 output_CPT(
   data,
@@ -13,37 +13,43 @@ output_CPT(
   station,
   year,
   element,
-  long.data = TRUE,
+  long_data = TRUE,
   na_code = -999
 )
 }
 \arguments{
-\item{data}{The data.frame to calculate from.}
+\item{data}{\code{data.frame} The data.frame to calculate from.}
 
-\item{lat_lon_data}{TODO}
+\item{lat_lon_data}{\code{data.frame} The name of the metadata to calculate from.}
 
-\item{station_latlondata}{TODO}
+\item{station_latlondata}{\code{character(1)} The name of the station column in \code{lat_lon_data}, or \code{data} if \code{long_data = FALSE}.}
 
-\item{latitude}{TODO}
+\item{latitude}{\code{character(1)} The name of the latitude column in \code{lat_lon_data}, or \code{data} if \code{long_data = FALSE}.}
 
-\item{longitude}{TODO}
+\item{longitude}{\code{character(1)} The name of the longitude column in \code{lat_lon_data}, or \code{data} if \code{long_data = FALSE}.}
 
-\item{station}{The name of the station column in \code{data}, if the data are for multiple station.}
+\item{station}{\code{character(1)} The name of the station column in \code{data}, if the data are for multiple station.}
 
-\item{year}{The name of the year column in \code{data}.}
+\item{year}{\code{character(1)} The name of the year column in \code{data}.}
 
-\item{element}{The name of the column in \code{data} to apply the function to.}
+\item{element}{\code{character(1)} The name of the element column in \code{data} to apply the function to.}
 
-\item{long.data}{TODO}
+\item{long_data}{\code{logical(1)} Whether all columns are in \code{data}. If all data is in one data frame then must have \code{long_data = TRUE}.}
 
-\item{na_code}{TODO}
+\item{na_code}{\code{numeric(1)} Indicator for NA values in data.}
 }
 \value{
-
+A data.frame formatted for use in CPT.
 }
 \description{
-Title
+\code{output_CPT} returns a data frame to a format suitable for
+use in the CPT software.
 }
 \examples{
-# TODO
+# Create summary data
+yearly_niger <- daily_niger \%>\% dplyr::group_by(station_name, year) \%>\%
+    dplyr::summarise(mean_rain = mean(rain))
+output_CPT(data = yearly_niger, lat_lon_data = stations_niger,
+           station_latlondata = "station_name", latitude = "lat", longitude = "long",
+           station = "station_name", year = "year", element = "mean_rain")
 }

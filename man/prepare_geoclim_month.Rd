@@ -6,8 +6,9 @@
 \usage{
 prepare_geoclim_month(
   data,
-  year,
-  month,
+  date_time = NULL,
+  year = NULL,
+  month = NULL,
   element,
   station_id,
   latitude,
@@ -18,32 +19,44 @@ prepare_geoclim_month(
 )
 }
 \arguments{
-\item{data}{The data.frame to calculate from.}
+\item{data}{\code{data.frame} The data.frame to calculate from.}
 
-\item{year}{The name of the year column in \code{data}.}
+\item{date_time}{\code{\link[base]{Date}} The name of the date column in \code{data}.}
 
-\item{month}{The name of the month column in \code{data}.}
+\item{year}{\code{character(1)} The name of the year column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[date_time]])}.}
 
-\item{element}{The name of the column in \code{data} to apply the function to.}
+\item{month}{\code{character(1)} The name of the month column in \code{data}. If \code{NULL} it will be created using \code{lubridate::month(data[[date_time]])}.}
 
-\item{station_id}{TODO}
+\item{element}{\code{character(1)} The name of the element column in \code{data} to apply the function to.}
 
-\item{latitude}{TODO}
+\item{station_id}{\code{character(1)} The name of the station column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{longitude}{TODO}
+\item{latitude}{\code{character(1)} The name of the latitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{metadata}{TODO}
+\item{longitude}{\code{character(1)} The name of the longitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{join_by}{TODO}
+\item{metadata}{\code{data.frame} The metadata data.frame to calculate from.}
 
-\item{add_cols}{TODO}
+\item{join_by}{\code{character} The variable(s) to merge the \code{data} and \code{metadata} data frames.}
+
+\item{add_cols}{\code{character} Names of additional metadata columns that should be included in the output}
 }
 \value{
-
+A data.frame formatted for use in GeoCLIM
 }
 \description{
-Prepare monthly data in GeoCLIM format
+\code{prepare_geoclim_month} takes a data frame that is in monthly
+format. This data is then rearranged to a format suitable for use in GeoCLIM.
+This data frame can be rearranged and exported to a file or connection with
+\code{export_geoclim_month}.
 }
 \examples{
-# TODO
+# Calculate monthly summaries for the rainfall column
+summary_data <- daily_niger \%>\% dplyr::group_by(year, month, station_name) \%>\%
+     dplyr::summarise(mean_rain = mean(rain))
+prepare_geoclim_month(data = summary_data, year = "year", month = "month",
+                   station_id = "station_name",
+                   element = "mean_rain", metadata = stations_niger,
+                   join_by = "station_name",
+                   latitude = "lat", longitude = "long")
 }

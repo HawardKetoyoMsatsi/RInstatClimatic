@@ -2,11 +2,11 @@
 % Please edit documentation in R/inventory_plot.R
 \name{inventory_plot}
 \alias{inventory_plot}
-\title{Inventory Plot}
+\title{Produce an inventory of available and missing data}
 \usage{
 inventory_plot(
   data,
-  date,
+  date_time,
   elements,
   station = NULL,
   year = NULL,
@@ -44,42 +44,42 @@ inventory_plot(
 )
 }
 \arguments{
-\item{data}{The data.frame to calculate from.}
+\item{data}{\code{data.frame} The data.frame to calculate from.}
 
-\item{date}{The name of the date column in \code{data}.}
+\item{date_time}{\code{\link[base]{Date}} The name of the date column in \code{data}.}
 
-\item{elements}{The name of the column in \code{data} to apply the function to.}
+\item{elements}{\code{character} The name of the elements column in \code{data} to apply the function to.}
 
-\item{station}{The name of the station column in \code{data}, if the data are for multiple station.}
+\item{station}{\code{character(1)} The name of the station column in \code{data}, if the data are for multiple station.}
 
-\item{year}{The name of the year column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[date]])}.}
+\item{year}{\code{character(1)} The name of the year column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[date_time]])}.}
 
-\item{doy}{The name of the day of the year (1-366) column in \code{data}.
-If \code{doy} is \code{NULL} then it can be calculated as \code{yday_366(data[[date]])} if \code{date} is provided.}
+\item{doy}{\code{character(1)} The name of the day of the year (1-366) column in \code{data}. If \code{doy} is \code{NULL} then it can be calculated as \code{yday_366(data[[date_time]])} if \code{date_time} is provided.}
 
-\item{year_doy_plot}{TODO}
+\item{year_doy_plot}{\code{logical(1)} Whether the day of year should be on the y-axis on the plot.}
 
-\item{facet_by}{TODO}
+\item{facet_by}{\code{character(1)} Whether to facet by stations, elements, or both. Options are \code{"stations"}, \code{"elements"}, \code{"station-elements"}, \code{"elements-stations"}.
+In \code{"station-elements"}, stations are given as rows and elements as columns. In \code{"elements-stations"}, elements are given as rows and stations as columns.}
 
-\item{facet_x_size}{TODO}
+\item{facet_x_size}{\code{numeric(1)} Text size for the facets on the x-axis in pts.}
 
-\item{facet_y_size}{TODO}
+\item{facet_y_size}{\code{numeric(1)} Text size for the facets on the y-axis in pts.}
 
-\item{title}{The text for the title.}
+\item{title}{\code{character(1)} The text for the title.}
 
-\item{plot_title_size}{TODO}
+\item{plot_title_size}{\code{numeric(1)} Text size for the title in pts.}
 
-\item{plot_title_hjust}{TODO}
+\item{plot_title_hjust}{\code{numeric(1)} Horizontal justification for title. Value between 0 and 1.}
 
-\item{x_title}{The text for the x-axis.}
+\item{x_title}{\code{character(1)} The text for the x-axis.}
 
-\item{y_title}{The text for the y-axis.}
+\item{y_title}{\code{character(1)} The text for the y-axis.}
 
-\item{x_scale_from}{TODO - see ?scale_continuous}
+\item{x_scale_from}{\code{integer(1)} The year to display the inventory plot from.}
 
-\item{x_scale_to}{TODO}
+\item{x_scale_to}{\code{integer(1)} The year to display the inventory plot to.}
 
-\item{x_scale_by}{TODO}
+\item{x_scale_by}{\code{integer(1)} The difference, in years, to give the x tick marks between from and to.}
 
 \item{y_date_format}{TODO}
 
@@ -87,40 +87,58 @@ If \code{doy} is \code{NULL} then it can be calculated as \code{yday_366(data[[d
 
 \item{y_date_scale_step}{TODO}
 
-\item{facet_scales}{TODO}
+\item{facet_scales}{\code{character(1)} Are scales shared across all facets (the default, \code{"fixed"}),
+or do they vary across rows (\code{"free_x"}), columns (\code{"free_y"}), or both rows and columns (\code{"free"})?}
 
 \item{facet_dir}{TODO}
 
-\item{facet_x_margin}{TODO}
+\item{facet_x_margin}{\code{numeric(4)} Margin width around the text for the x-facets.}
 
-\item{facet_y_margin}{TODO}
+\item{facet_y_margin}{\code{numeric(4)} Margin width around the text for the y-facets.}
 
-\item{facet_nrow}{TODO}
+\item{facet_nrow}{\code{integer(1)} Number of rows for the facets if \code{facet_by} is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_ncol} is given.}
 
-\item{facet_ncol}{TODO}
+\item{facet_ncol}{\code{integer(1)} Number of rows for the facets if \code{facet_by} is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_nrow} is given.}
 
-\item{missing_colour}{TODO}
+\item{missing_colour}{\code{character(1)} Colour to represent the missing values. Default \code{"red"}.}
 
-\item{present_colour}{TODO}
+\item{present_colour}{\code{character(1)} Colour to represent the observed values. Default \code{"grey"}.}
 
-\item{missing_label}{TODO}
+\item{missing_label}{\code{character(1)} Label to give in legend for missing values. Default \code{"Missing"}.}
 
-\item{present_label}{TODO}
+\item{present_label}{\code{character(1)} Label to give in legend for observed values. Default \code{"Present"}.}
 
-\item{display_rain_days}{TODO}
+\item{display_rain_days}{\code{logical(1)} If \code{rain} parameter is not \code{NULL}, and \code{rain} is not an element in the \code{elements} parameter, whether to include dry and rainy days.}
 
-\item{rain}{TODO}
+\item{rain}{\code{character(1)} The name of the rain column in \code{data}.}
 
 \item{rain_cats}{TODO}
 
-\item{coord_flip}{TODO}
+\item{coord_flip}{\code{logical(1)} Whether to switch the x and y axes.}
+
+\item{labels}{\code{character} If \code{display_rain_days = TRUE}, the labels in the key for dry and rainy days. By default, \code{c("Dry", "Rain")}}
+
+\item{key_colours}{\code{character} If \code{display_rain_days = TRUE}, the colours for dry and rainy days. By default, \code{c("tan3", "blue"))}}
 }
 \value{
-
+A plot of type \code{ggplot} to the default plot device
 }
 \description{
-Produces an inventory of available and missing data
+Returns an inventory plot using \code{ggplot2} that displays
+whether a value is observed or missing for each element and station given.
+Takes a data frame as an input and the relevant columns to create the plot.
 }
 \examples{
-# TODO
+# Create an inventory plot with two elements and by station.
+data(daily_niger)
+inventory_plot(data = daily_niger, station = "station_name", elements = c("tmax", "tmin"),
+               date_time = "date")
+
+# Create an inventory plot by year and day of year
+inventory_plot(data = daily_niger, station = "station_name", elements = c("tmax", "tmin"),
+               date_time = "date", year_doy_plot = TRUE)
+
+# Can add in rainy/dry days into the plot
+inventory_plot(data = daily_niger, station = "station_name", elements = c("tmax", "tmin"),
+               date_time = "date", rain = "rain", display_rain_days = TRUE)
 }

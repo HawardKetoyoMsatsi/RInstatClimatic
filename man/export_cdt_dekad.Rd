@@ -2,13 +2,13 @@
 % Please edit documentation in R/export_cdt_dekad.R
 \name{export_cdt_dekad}
 \alias{export_cdt_dekad}
-\title{Export data in CDT format for dekad data}
+\title{Export dekad data in CDT format}
 \usage{
 export_cdt_dekad(
   data,
   station,
   element,
-  date,
+  date_time,
   latitude,
   longitude,
   altitude,
@@ -21,42 +21,42 @@ export_cdt_dekad(
 )
 }
 \arguments{
-\item{data}{data.frame of dekadal climatic data in tidy format i.e. one row
+\item{data}{\code{data.frame} data.frame of dekadal climatic data in tidy format i.e. one row
 per dekad (per station) and one column per element.}
 
-\item{station}{Name of the station identifying column in \code{data}.}
+\item{station}{\code{character(1)} Name of the station identifying column in \code{data}.}
 
-\item{element}{Name of the element column in \code{data}.}
+\item{element}{\code{character(1)} Name of the element column in \code{data}.}
 
-\item{date}{Name of the date column in \code{data}. Required if \code{type =
+\item{date_time}{\code{character(1)} Name of the date column in \code{data}. Required if \code{type =
   "daily"}. If \code{type = "dekad"} this is only needed if \code{year},
 \code{month}, and \code{dekad} are not specified.}
 
-\item{latitude}{Name of the latitude column in \code{metadata}.}
+\item{latitude}{\code{character(1)} Name of the latitude column in \code{metadata}.}
 
-\item{longitude}{Name of the longitude column in \code{metadata}.}
+\item{longitude}{\code{character(1)} Name of the longitude column in \code{metadata}.}
 
-\item{altitude}{Name of the altitude column in \code{metadata}.}
+\item{altitude}{\code{character(1)} Name of the altitude column in \code{metadata}.}
 
-\item{year}{Name of the year column in \code{data}. Only needed if \code{type
+\item{year}{\code{character(1)} Name of the year column in \code{data}. Only needed if \code{type
   = "dekad"}. If \code{NULL} it will be created using
-\code{lubridate::year(data[[date]])}.}
+\code{lubridate::year(data[[date_time]])}.}
 
-\item{month}{Name of the month column in \code{data}. Only needed if
+\item{month}{\code{character(1)} Name of the month column in \code{data}. Only needed if
 \code{type = "dekad"}. If \code{NULL} it will be created using
-\code{lubridate::month(data[[date]])}.}
+\code{lubridate::month(data[[date_time]])}.}
 
-\item{dekad}{Name of the dekad column in \code{data}. Only needed if
+\item{dekad}{\code{character(1)} Name of the dekad column in \code{data}. Only needed if
 \code{type = "dekad"}. If \code{NULL} it will be created using \code{dekad}
 function.}
 
-\item{metadata}{data.frame of station metadata. Use this is the station
+\item{metadata}{\code{data.frame} data.frame of station metadata. Use this is the station
 details are in a separate data.frame with one row per station. If
 specified, \code{latitude}, \code{longitude} and \code{altitude} are
 assumed to be in \code{metadata} and \code{station} must be in both
 \code{data} and \code{metadata} to facilitate joining.}
 
-\item{file_path}{A character specifying the file path and file name to export}
+\item{file_path}{\code{character(1)} A character specifying the file path and file name to export.}
 
 \item{...}{Other parameters passed to \code{write.csv()}}
 }
@@ -64,9 +64,20 @@ assumed to be in \code{metadata} and \code{station} must be in both
 Invisibly returns the file path of the saved data
 }
 \description{
-Export data in CDT format for dekad data
+\code{export_cdt_dekad} takes a data frame that has elements summarised
+by dekad. This data frame is then rearranged using \code{prepare_cdt_dekad} to a
+format suitable for use in CDT, and then written to a file or connection.
 }
 \examples{
-# TODO
-
+# To write daily_niger data to CDT format
+# first put daily_niger data into a dekad format
+data(daily_niger)
+summary_data <- daily_niger \%>\%
+                   dplyr::mutate(dekad_date = dekad(daily_niger$date)) \%>\%
+                   dplyr::group_by(station_name, year, dekad_date) \%>\%
+                   dplyr::summarise(date = dplyr::first(date), sum = sum(tmax))
+# NOT RUN:
+#export_cdt_dekad(data = daily_niger, station = "station_name", element = "rain",
+#           date_time = "date", latitude = "lat", longitude = "long", altitude = "alt",
+#           metadata = stations_niger)
 }
