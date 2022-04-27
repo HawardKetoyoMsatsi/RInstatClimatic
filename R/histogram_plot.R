@@ -1,4 +1,8 @@
 #' Produce a histogram of elements by station.
+#' 
+#' @description Returns a histogram using \code{ggplot2} for each element and
+#' station given. Takes a data frame as an input and the relevant columns to
+#' create the plot.
 #'
 #' @param data \code{data.frame} The data.frame to calculate from.
 #' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
@@ -18,7 +22,7 @@
 #' @param x_title \code{character(1)} The text for the x-axis.
 #' @param y_title \code{character(1)} The text for the y-axis.
 #'
-#' @return A plot of type \code{ggplot} to the default plot device
+#' @return a \code{ggplot} object.
 #' @export
 #'
 #' @examples

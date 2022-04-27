@@ -1,6 +1,7 @@
 #' Windrose from the clifro package
 #' 
-#' A wrapper for plotting a windrose of wind speed and direction using \code{ggplot2}
+#' @description Returns a windrose plot using \code{ggplot2} of wind speed and
+#' direction. This function is a wrapper of the `clifro::windrose()` function.
 #'
 #' @param data \code{data.frame} The data.frame to calculate from.
 #' @param speed \code{numeric} A vector containing wind speeds.
@@ -18,10 +19,16 @@
 #' @param variable_wind \code{numeric(1)} Variable winds (if applicable).
 #' @param n_col \code{integer(1)} The number of columns to plot (default 1).
 #'
-#' @return
+#' @seealso \code{\link[ggplot2]{theme}} for more possible arguments to pass to \code{windrose}.
+#' 
+#' @return a \code{ggplot} object.
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' # Generate a windrose plot for the daily_niger data
+#' data(daily_niger)
+#' windrose_plot <- windrose(data = daily_niger, speed = "ws", direction = "wd",
+#'                           facet_by = "station_name")
 windrose <- function(data, speed, direction, facet_by = NULL, n_directions = 12, n_speeds = 5, speed_cuts = NA, col_pal = "GnBu",
                      ggtheme = c("grey", "gray", "bw", "linedraw", "light", "minimal", "classic"),
                      legend_title = "Wind Speed", calm_wind = 0, variable_wind = 990, n_col = NULL) {

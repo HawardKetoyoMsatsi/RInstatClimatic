@@ -2,7 +2,7 @@
 % Please edit documentation in R/climatic_summary.R
 \name{climatic_summary}
 \alias{climatic_summary}
-\title{Title}
+\title{Calculate summaries from climatic data}
 \usage{
 climatic_summary(
   data,
@@ -51,7 +51,7 @@ climatic_summary(
 
 \item{to}{\code{character(1)} The date-time format to put the data into.}
 
-\item{by}{TODO}
+\item{by}{\code{character} The name of columns in \code{data} to group the summary data by.}
 
 \item{doy}{\code{character(1)} The name of the day of the year (1-366) column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[doy]])}.}
 
@@ -88,11 +88,16 @@ Must be a list of lists with the same names as \code{summaries}.}
 \code{dplyr::across}}
 }
 \value{
-
+A summary data frame for selected element(s) in climatic data.
 }
 \description{
-Title
+\code{climatic_summary} returns a data table displaying
+summary statistics for element(s) (and for each station) in a given time period.
 }
 \examples{
-# TODO
+# Calculate frequencies for tmin/tmax for each year, month, and station.
+# filter daily_niger data for the example
+daily_niger_1 <- daily_niger \%>\% dplyr::filter(year > 1960)
+climatic_summary(data = daily_niger_1, date_time = "date", station = "station_name",
+                 elements = c("tmin", "tmax"), to = "monthly")
 }

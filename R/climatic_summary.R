@@ -1,4 +1,7 @@
-#' Title
+#' Calculate summaries from climatic data
+#' 
+#' @description \code{climatic_summary} returns a data table displaying
+#' summary statistics for element(s) (and for each station) in a given time period.
 #' 
 #' @param data \code{data.frame} The data.frame to calculate from.
 #' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
@@ -9,7 +12,7 @@
 #' @param dekad \code{character(1)} The name of the dekad column in \code{data}.
 #' @param pentad \code{character(1)} The name of the pentad column in \code{data}.
 #' @param to \code{character(1)} The date-time format to put the data into.
-#' @param by TODO
+#' @param by \code{character} The name of columns in \code{data} to group the summary data by.
 #' @param doy \code{character(1)} The name of the day of the year (1-366) column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[doy]])}.
 #' @param doy_first \code{integer(1)} The first day of the year.
 #' @param doy_last \code{integer(1)} The last day of the year.
@@ -31,11 +34,17 @@
 #' @param n_dates \code{logical(1)} If \code{TRUE} the number of \code{date_time} points when the value equals the summary value is included. Generally only used for extreme summaries i.e. number of days in which the minimum occurred.
 #' @param last_date \code{logical(1)} If \code{TRUE} the last instance of \code{date_time} when the value equals the summary value is included. Generally only used for extreme summaries i.e. last \code{date_time} when the maximum occurred.
 #'
-#' @return
+#' @return A summary data frame for selected element(s) in climatic data.
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' # Calculate frequencies for tmin/tmax for each year, month, and station.
+#' # filter daily_niger data for the example
+#' daily_niger_1 <- daily_niger %>% dplyr::filter(year > 1960)
+#' climatic_summary(data = daily_niger_1, date_time = "date", station = "station_name",
+#'                  elements = c("tmin", "tmax"), to = "monthly")
 #' @importFrom rlang .data
+
 climatic_summary <- function(data, date_time, station = NULL, elements = NULL, 
                              year = NULL, month = NULL, dekad = NULL, 
                              pentad = NULL,
@@ -56,6 +65,15 @@ climatic_summary <- function(data, date_time, station = NULL, elements = NULL,
   assert_column_names(data, date_time)
   checkmate::assert(checkmate::check_date(data[[date_time]]), 
                     checkmate::check_posixct(data[[date_time]]))
+  checkmate::assert_character(elements)
+  assert_column_names(data, elements)
+  if (length(elements) == 1 && 
+      elements == "obsValue" && 
+      "describedBy" %in% names(data)) {
+    element_names <- as.character(unique(data[["describedBy"]]))
+    data <- elements_wider(data, name = "describedBy", value = elements)
+    elements <- element_names
+  }
   checkmate::assert_string(station, null.ok = TRUE)
   if (!is.null(station)) assert_column_names(data, station)
   checkmate::assert_string(year, null.ok = TRUE)

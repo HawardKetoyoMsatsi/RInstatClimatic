@@ -1,11 +1,28 @@
 #' Export pentad data in GeoCLIM format
+#'
+#' @description `export_geoclim_pentad` takes a data frame that is in a pentad
+#' format. This data frame is then rearranged using `prepare_geoclim_pentad` to a
+#' format suitable for use in GeoCLIM, and then written to a file or connection.
+#' 
 #' @inheritParams export_geoclim
 #' @inheritParams prepare_geoclim_pentad
 #'
-#' @return Invisibly returns the file path of the saved data
+#' @return Invisibly returns the file path of the saved data.
 #' @export
 #'
-#' @examples # TODO
+#' @examples
+#' # Calculate pentad summaries for the rainfall column
+#' pentad_data <- daily_niger %>% dplyr::mutate(pentad = pentad(date))
+#' # Summarise the data
+#' summary_data <- pentad_data %>% dplyr::group_by(station_name, year, pentad) %>%
+#'       dplyr::summarise(mean_rain = mean(rain, na.rm = TRUE))
+#' # NOT RUN: Export the data to CSV format
+#' #export_geoclim_pentad(data = summary_data, year = "year",
+#' #                     station_id = "station_name",
+#' #                     pentad = "pentad",
+#' #                     element = "mean_rain", metadata = stations_niger, 
+#' #                     join_by = "station_name",
+#' #                     latitude = "lat", longitude = "long")
 export_geoclim_pentad <- function(data, year, pentad, element, metadata = NULL,
                                   join_by = NULL, station_id,
                                   latitude, longitude, add_cols = NULL,

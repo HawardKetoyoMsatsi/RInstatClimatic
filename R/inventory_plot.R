@@ -1,9 +1,8 @@
 #' Produce an inventory of available and missing data
 #' 
-#' @description 
-#' Creates an inventory plot displaying whether a value is observed or missing for each element and station given.
+#' @description Returns an inventory plot using \code{ggplot2} that displays
+#' whether a value is observed or missing for each element and station given.
 #' Takes a data frame as an input and the relevant columns to create the plot.
-#' Creates a graph using \code{ggplot2} and returns a inventory plot.
 #'
 #' @param data \code{data.frame} The data.frame to calculate from.
 #' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
@@ -30,8 +29,8 @@
 #' @param facet_scales \code{character(1)} Are scales shared across all facets (the default, \code{"fixed"}),
 #' or do they vary across rows (\code{"free_x"}), columns (\code{"free_y"}), or both rows and columns (\code{"free"})?
 #' @param facet_dir TODO
-#' @param facet_x_margin \code{numeric} Margin width around the text for the x-facets.
-#' @param facet_y_margin \code{numeric} Margin width around the text for the y-facets.
+#' @param facet_x_margin \code{numeric(4)} Margin width around the text for the x-facets.
+#' @param facet_y_margin \code{numeric(4)} Margin width around the text for the y-facets.
 #' @param facet_nrow \code{integer(1)} Number of rows for the facets if `facet_by` is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_ncol} is given.
 #' @param facet_ncol \code{integer(1)} Number of rows for the facets if `facet_by` is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_nrow} is given.
 #' @param missing_colour \code{character(1)} Colour to represent the missing values. Default \code{"red"}.
@@ -83,9 +82,18 @@ inventory_plot <- function(data, date_time, elements, station = NULL, year = NUL
   checkmate::assert_data_frame(data)
   assert_column_names(data, date_time)
   checkmate::assert_string(date_time)
-  checkmate::assert_date(data[[date_time]])
+  checkmate::assert(checkmate::check_date(data[[date_time]]), 
+                    checkmate::check_posixct(data[[date_time]]))
+  data[[date_time]] <- as.Date(data[[date_time]])
   checkmate::assert_character(elements)
   assert_column_names(data, elements)
+  if (length(elements) == 1 && 
+      elements == "obsValue" && 
+      "describedBy" %in% names(data)) {
+    element_names <- as.character(unique(data[["describedBy"]]))
+    data <- elements_wider(data, name = "describedBy", value = elements)
+    elements <- element_names
+  }
   if (!is.null(station)) assert_column_names(data, station)
   
   if (display_rain_days && !is.null(rain) && !rain %in% elements) elements <- c(elements, rain)

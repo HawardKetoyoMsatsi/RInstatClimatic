@@ -92,9 +92,9 @@ or do they vary across rows (\code{"free_x"}), columns (\code{"free_y"}), or bot
 
 \item{facet_dir}{TODO}
 
-\item{facet_x_margin}{\code{numeric} Margin width around the text for the x-facets.}
+\item{facet_x_margin}{\code{numeric(4)} Margin width around the text for the x-facets.}
 
-\item{facet_y_margin}{\code{numeric} Margin width around the text for the y-facets.}
+\item{facet_y_margin}{\code{numeric(4)} Margin width around the text for the y-facets.}
 
 \item{facet_nrow}{\code{integer(1)} Number of rows for the facets if \code{facet_by} is one of \code{"stations"} or \code{"elements"}. Only if \code{facet_ncol} is given.}
 
@@ -124,9 +124,9 @@ or do they vary across rows (\code{"free_x"}), columns (\code{"free_y"}), or bot
 A plot of type \code{ggplot} to the default plot device
 }
 \description{
-Creates an inventory plot displaying whether a value is observed or missing for each element and station given.
+Returns an inventory plot using \code{ggplot2} that displays
+whether a value is observed or missing for each element and station given.
 Takes a data frame as an input and the relevant columns to create the plot.
-Creates a graph using \code{ggplot2} and returns a inventory plot.
 }
 \examples{
 # Create an inventory plot with two elements and by station.

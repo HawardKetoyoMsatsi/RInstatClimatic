@@ -16,34 +16,36 @@ prepare_cdt_daily(
 )
 }
 \arguments{
-\item{data}{data.frame of daily climatic data in tidy format i.e. one row
+\item{data}{\code{data.frame} data.frame of daily climatic data in tidy format i.e. one row
 per day (per station) and one column per element.}
 
-\item{station}{Name of the station identifying column in \code{data}.}
+\item{station}{\code{character(1)} Name of the station identifying column in \code{data}.}
 
-\item{element}{Name of the element column in \code{data}.}
+\item{element}{\code{character(1)} Name of the element column in \code{data}.}
 
-\item{date_time}{Name of the date column in \code{data}. Required if \code{type =
+\item{date_time}{\code{character(1)} Name of the date column in \code{data}. Required if \code{type =
   "daily"}. If \code{type = "dekad"} this is only needed if \code{year},
 \code{month}, and \code{dekad} are not specified.}
 
-\item{metadata}{data.frame of station metadata. Use this is the station
+\item{metadata}{\code{data.frame} data.frame of station metadata. Use this is the station
 details are in a separate data.frame with one row per station. If
 specified, \code{latitude}, \code{longitude} and \code{altitude} are
 assumed to be in \code{metadata} and \code{station} must be in both
 \code{data} and \code{metadata} to facilitate joining.}
 
-\item{latitude}{Name of the latitude column in \code{metadata}.}
+\item{latitude}{\code{character(1)} Name of the latitude column in \code{metadata}.}
 
-\item{longitude}{Name of the longitude column in \code{metadata}.}
+\item{longitude}{\code{character(1)} Name of the longitude column in \code{metadata}.}
 
-\item{altitude}{Name of the altitude column in \code{metadata}.}
+\item{altitude}{\code{character(1)} Name of the altitude column in \code{metadata}.}
 }
 \value{
 A data.frame formatted for use in CDT
 }
 \description{
-Prepare CDT for Daily data
+\code{prepare_cdt_daily} takes daily data. This data is then
+rearranged to a format suitable for use in CDT. This data frame can be
+rearranged and exported to a file or connection with \code{export_cdt_daily}.
 }
 \examples{
 # Prepare daily_niger data for CDT export

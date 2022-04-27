@@ -24,32 +24,45 @@ export_geoclim_pentad(
 
 \item{year}{\code{character(1)} The name of the year column in \code{data}.}
 
-\item{pentad}{TODO}
+\item{pentad}{\code{character(1)} The name of the pentad column in \code{data}.}
 
 \item{element}{\code{character(1)} The name of the element column in \code{data} to apply the function to.}
 
-\item{metadata}{TODO}
+\item{metadata}{\code{data.frame} The metadata data.frame to calculate from.}
 
-\item{join_by}{TODO}
+\item{join_by}{\code{character} The variable(s) to merge the \code{data} and \code{metadata} data frames.}
 
-\item{station_id}{TODO}
+\item{station_id}{\code{character(1)} The name of the station column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{latitude}{TODO}
+\item{latitude}{\code{character(1)} The name of the latitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{longitude}{TODO}
+\item{longitude}{\code{character(1)} The name of the longitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{add_cols}{Names of additional metadata columns that should be included in the output}
+\item{add_cols}{\code{character} Names of additional metadata columns that should be included in the output}
 
-\item{file_path}{TODO}
+\item{file_path}{\code{character(1)} A character specifying the file path and file name to export.}
 
 \item{...}{Other parameters passed to \code{write.csv()}}
 }
 \value{
-Invisibly returns the file path of the saved data
+Invisibly returns the file path of the saved data.
 }
 \description{
-Export pentad data in GeoCLIM format
+\code{export_geoclim_pentad} takes a data frame that is in a pentad
+format. This data frame is then rearranged using \code{prepare_geoclim_pentad} to a
+format suitable for use in GeoCLIM, and then written to a file or connection.
 }
 \examples{
-# TODO
+# Calculate pentad summaries for the rainfall column
+pentad_data <- daily_niger \%>\% dplyr::mutate(pentad = pentad(date))
+# Summarise the data
+summary_data <- pentad_data \%>\% dplyr::group_by(station_name, year, pentad) \%>\%
+      dplyr::summarise(mean_rain = mean(rain, na.rm = TRUE))
+# NOT RUN: Export the data to CSV format
+#export_geoclim_pentad(data = summary_data, year = "year",
+#                     station_id = "station_name",
+#                     pentad = "pentad",
+#                     element = "mean_rain", metadata = stations_niger, 
+#                     join_by = "station_name",
+#                     latitude = "lat", longitude = "long")
 }

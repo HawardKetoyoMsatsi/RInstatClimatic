@@ -59,10 +59,12 @@ Histogram plots are calculated separately for each station.}
 \item{y_title}{\code{character(1)} The text for the y-axis.}
 }
 \value{
-A plot of type \code{ggplot} to the default plot device
+a \code{ggplot} object.
 }
 \description{
-Produce a histogram of elements by station.
+Returns a histogram using \code{ggplot2} for each element and
+station given. Takes a data frame as an input and the relevant columns to
+create the plot.
 }
 \examples{
 data("daily_niger")

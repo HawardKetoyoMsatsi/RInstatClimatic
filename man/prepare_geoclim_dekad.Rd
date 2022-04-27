@@ -22,28 +22,40 @@ prepare_geoclim_dekad(
 
 \item{year}{\code{character(1)} The name of the year column in \code{data}.}
 
-\item{dekad}{TODO}
+\item{dekad}{\code{character(1)} The name of the dekad column in \code{data}.}
 
 \item{element}{\code{character(1)} The name of the element column in \code{data} to apply the function to.}
 
-\item{station_id}{TODO}
+\item{station_id}{\code{character(1)} The name of the station column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{latitude}{TODO}
+\item{latitude}{\code{character(1)} The name of the latitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{longitude}{TODO}
+\item{longitude}{\code{character(1)} The name of the longitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.}
 
-\item{metadata}{TODO}
+\item{metadata}{\code{data.frame} The metadata data.frame to calculate from.}
 
-\item{join_by}{TODO}
+\item{join_by}{\code{character} The variable(s) to merge the \code{data} and \code{metadata} data frames.}
 
-\item{add_cols}{Names of additional metadata columns that should be included in the output}
+\item{add_cols}{\code{character} Names of additional metadata columns that should be included in the output}
 }
 \value{
-
+A data.frame formatted for use in GeoCLIM
 }
 \description{
-Prepare dekad data in GeoCLIM format
+\code{prepare_geoclim_dekad} takes a data frame that is in dekad
+format. This data is then rearranged to a format suitable for use in GeoCLIM.
+This data frame can be rearranged and exported to a file or connection with
+\code{export_geoclim_dekad}.
 }
 \examples{
-# TODO
+# Calculate dekadal summaries for the rainfall column
+dekad_data <- daily_niger \%>\% dplyr::mutate(dekad = dekad(date))
+summary_data <- dekad_data \%>\% dplyr::group_by(station_name, year, dekad) \%>\%
+    dplyr::summarise(mean_rain = mean(rain, na.rm = TRUE))
+prepare_geoclim_dekad(data = summary_data, year = "year",
+                      station_id = "station_name",
+                      dekad = "dekad",
+                      element = "mean_rain", metadata = stations_niger, 
+                      join_by = "station_name",
+                      latitude = "lat", longitude = "long")
 }
