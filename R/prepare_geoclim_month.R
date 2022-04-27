@@ -1,32 +1,48 @@
 #' Prepare monthly data in GeoCLIM format
+#' 
+#' @description `prepare_geoclim_month` takes a data frame that is in monthly
+#' format. This data is then rearranged to a format suitable for use in GeoCLIM.
+#' This data frame can be rearranged and exported to a file or connection with
+#' `export_geoclim_month`.
 #'
 #' @param data \code{data.frame} The data.frame to calculate from.
-#' @param year \code{character(1)} The name of the year column in \code{data}.
-#' @param month \code{character(1)} The name of the month column in \code{data}.
+#' @param date_time \code{\link[base]{Date}} The name of the date column in \code{data}.
+#' @param year \code{character(1)} The name of the year column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[date_time]])}.
+#' @param month \code{character(1)} The name of the month column in \code{data}. If \code{NULL} it will be created using \code{lubridate::month(data[[date_time]])}.
 #' @param element \code{character(1)} The name of the element column in \code{data} to apply the function to.
-#' @param station_id TODO
-#' @param latitude TODO
-#' @param longitude TODO
-#' @param metadata TODO
-#' @param join_by TODO
-#' @param add_cols TODO
+#' @param station_id \code{character(1)} The name of the station column in \code{metadata}, or \code{data} if \code{metadata = NULL}.
+#' @param latitude \code{character(1)} The name of the latitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.
+#' @param longitude \code{character(1)} The name of the longitude column in \code{metadata}, or \code{data} if \code{metadata = NULL}.
+#' @param metadata \code{data.frame} The metadata data.frame to calculate from.
+#' @param join_by \code{character} The variable(s) to merge the \code{data} and \code{metadata} data frames.
+#' @param add_cols \code{character} Names of additional metadata columns that should be included in the output
 #'
-#' @return
+#' @return A data.frame formatted for use in GeoCLIM
 #' @export
 #'
-#' @examples # TODO
-prepare_geoclim_month <- function(data, year, month, element, station_id, 
+#' @examples
+#' # Calculate monthly summaries for the rainfall column
+#' summary_data <- daily_niger %>% dplyr::group_by(year, month, station_name) %>%
+#'      dplyr::summarise(mean_rain = mean(rain))
+#' prepare_geoclim_month(data = summary_data, year = "year", month = "month",
+#'                    station_id = "station_name",
+#'                    element = "mean_rain", metadata = stations_niger,
+#'                    join_by = "station_name",
+#'                    latitude = "lat", longitude = "long")
+
+prepare_geoclim_month <- function(data, date_time = NULL, year = NULL, month = NULL, element, station_id, 
                                   latitude, longitude, metadata = NULL,
                                   join_by = NULL, add_cols = NULL) {
   checkmate::assert_data_frame(data)
   checkmate::assert_string(year)
-  assert_column_names(data, year)
   checkmate::assert_string(month)
-  assert_column_names(data, month)
   checkmate::assert_string(element)
   assert_column_names(data, element)
   checkmate::assert_data_frame(metadata, null.ok = TRUE)
   checkmate::assert_string(join_by, null.ok = TRUE)
+  if (!is.null(date_time)) assert_column_names(data, date_time)
+  if (!is.null(year)) assert_column_names(data, year)
+  if (!is.null(month)) assert_column_names(data, month)
   if (is.null(names(join_by))) names(join_by) <- join_by
   checkmate::assert_string(station_id)
   checkmate::assert_string(latitude)
@@ -41,6 +57,15 @@ prepare_geoclim_month <- function(data, year, month, element, station_id,
   assert_column_names(data_with_meta, station_id)
   assert_column_names(data_with_meta, latitude)
   assert_column_names(data_with_meta, longitude)
+  
+  if(is.null(year)) {
+    year <- "year"
+    data[[year]] <- lubridate::year(data[[date_time]])
+  }
+  if(is.null(month)) {
+    month <- "month"
+    data[[month]] <- lubridate::month(data[[date_time]])
+  }
   
   unique_months <- unique(data[[month]])
   if (setequal(as.character(unique_months), as.character(1:12))) {

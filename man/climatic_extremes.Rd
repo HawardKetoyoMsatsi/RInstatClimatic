@@ -51,7 +51,7 @@ climatic_extremes(
 
 \item{to}{\code{character(1)} The date-time format to put the data into.}
 
-\item{by}{TODO}
+\item{by}{\code{character} The name of columns in \code{data} to group the summary data by.}
 
 \item{doy}{\code{character(1)} The name of the day of the year (1-366) column in \code{data}. If \code{NULL} it will be created using \code{lubridate::year(data[[doy]])}.}
 
@@ -85,11 +85,17 @@ any \code{na_} parameters are specified.}
 \code{dplyr::across}}
 }
 \value{
-
+A summary data frame containing minimum/maximum values for element(s).
 }
 \description{
-Calculate extremes from climatic data
+\code{climatic_extremes} returns a data table displaying the minimum and/or maximum
+values for elements in a given time period. This can be provided by station.
 }
 \examples{
-# TODO
+# Run example for a subset of the data
+daily_niger_1 <- daily_niger \%>\% dplyr::filter(year > 1970)
+# create a data frame displaying the min and max values for tmin/tmax for each day and station
+climatic_extremes(data = daily_niger_1, date_time = "date", elements = c("tmin", "tmax"),
+                  max_val = TRUE, min_val = TRUE,
+                  station = "station_name", na_rm = TRUE)
 }

@@ -18,30 +18,30 @@ export_cdt_daily(
 )
 }
 \arguments{
-\item{data}{data.frame of daily climatic data in tidy format i.e. one row
+\item{data}{\code{data.frame} data.frame of daily climatic data in tidy format i.e. one row
 per day (per station) and one column per element.}
 
-\item{station}{Name of the station identifying column in \code{data}.}
+\item{station}{\code{character(1)} Name of the station identifying column in \code{data}.}
 
-\item{element}{Name of the element column in \code{data}.}
+\item{element}{\code{character(1)} Name of the element column in \code{data}.}
 
-\item{date_time}{Name of the date column in \code{data}. Required if \code{type =
+\item{date_time}{\code{character(1)} Name of the date column in \code{data}. Required if \code{type =
   "daily"}. If \code{type = "dekad"} this is only needed if \code{year},
 \code{month}, and \code{dekad} are not specified.}
 
-\item{latitude}{Name of the latitude column in \code{metadata}.}
+\item{latitude}{\code{character(1)} Name of the latitude column in \code{metadata}.}
 
-\item{longitude}{Name of the longitude column in \code{metadata}.}
+\item{longitude}{\code{character(1)} Name of the longitude column in \code{metadata}.}
 
-\item{altitude}{Name of the altitude column in \code{metadata}.}
+\item{altitude}{\code{character(1)} Name of the altitude column in \code{metadata}.}
 
-\item{metadata}{data.frame of station metadata. Use this is the station
+\item{metadata}{\code{data.frame} data.frame of station metadata. Use this is the station
 details are in a separate data.frame with one row per station. If
 specified, \code{latitude}, \code{longitude} and \code{altitude} are
 assumed to be in \code{metadata} and \code{station} must be in both
 \code{data} and \code{metadata} to facilitate joining.}
 
-\item{file_path}{A character specifying the file path and file name to export}
+\item{file_path}{\code{character(1)} A character specifying the file path and file name to export.}
 
 \item{...}{Other parameters passed to \code{write.csv()}}
 }
@@ -49,11 +49,13 @@ assumed to be in \code{metadata} and \code{station} must be in both
 Invisibly returns the file path of the saved data
 }
 \description{
-Export daily data in the format for CDT
+\code{export_cdt_daily} takes a data frame with daily data.
+This data frame is then rearranged using \code{prepare_cdt_daily} to a
+format suitable for use in CDT, and then written to a file or connection.
 }
 \examples{
 # To write daily_niger data to CDT format
-## NOT RUN ##
+# NOT RUN:
 #export_cdt_daily(data = daily_niger, station = "station_name", element = "rain", type = "daily",
 #           date_time = "date", latitude = "lat", longitude = "long", altitude = "alt",
 #           metadata = stations_niger)
